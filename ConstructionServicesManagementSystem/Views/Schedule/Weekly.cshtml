@@ -1,0 +1,173 @@
+﻿@model List<ConstructionServicesManagementSystem.Models.Booking>
+
+@{
+    ViewData["Title"] = "Weekly Schedule";
+
+    DateTime weekStart = ViewBag.WeekStart;
+    DateTime weekEnd = ViewBag.WeekEnd;
+
+    var previousWeek = weekStart.AddDays(-7).ToString("yyyy-MM-dd");
+    var nextWeek = weekStart.AddDays(7).ToString("yyyy-MM-dd");
+    var today = DateTime.Today.ToString("yyyy-MM-dd");
+
+    var bookingsByDay = Model
+        .GroupBy(b => b.VisitDate.Date)
+        .ToDictionary(g => g.Key, g => g.ToList());
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Weekly Schedule</h2>
+            <p class="text-muted mb-0">
+                Alexis' schedule for
+                @weekStart.ToString("MMM dd") -
+                @weekEnd.ToString("MMM dd, yyyy")
+            </p>
+        </div>
+
+        <a asp-controller="Schedule"
+           asp-action="Weekly"
+           asp-route-date="@today"
+           class="btn btn-primary">
+            Today
+        </a>
+    </div>
+
+    <!-- Week Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <a asp-controller="Schedule"
+           asp-action="Weekly"
+           asp-route-date="@previousWeek"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-chevron-left"></i>
+            Previous Week
+        </a>
+
+        <h5 class="mb-0 fw-semibold">
+            @weekStart.ToString("MMMM dd") -
+            @weekEnd.ToString("MMMM dd, yyyy")
+        </h5>
+
+        <a asp-controller="Schedule"
+           asp-action="Weekly"
+           asp-route-date="@nextWeek"
+           class="btn btn-outline-secondary">
+            Next Week
+            <i class="bi bi-chevron-right"></i>
+        </a>
+
+    </div>
+
+    <!-- Weekly Calendar -->
+    <div class="row g-3">
+
+        @for (int i = 0; i < 7; i++)
+        {
+            var currentDay = weekStart.AddDays(i);
+
+            var hasBookings = bookingsByDay.ContainsKey(currentDay.Date);
+
+            <div class="col-lg-4 col-xl">
+                <div class="card h-100 shadow-sm">
+
+                    <!-- Day Header -->
+                    <div class="card-header text-center
+                                    @(currentDay.Date == DateTime.Today
+                                                             ? "bg-primary text-white"
+                                                             : "bg-light")">
+
+                    <div class="fw-bold">
+                        @currentDay.ToString("dddd")
+                    </div>
+
+                        <div>
+                            @currentDay.ToString("MMM dd")
+                        </div>
+
+                    </div>
+
+                    <!-- Bookings -->
+                    <div class="card-body">
+
+                    @if (hasBookings)
+                        {
+                            foreach (var booking in bookingsByDay[currentDay.Date])
+                            {
+                                <div class="border rounded p-3 mb-3">
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="badge bg-primary">
+                                            Booking #@booking.Id
+                                        </span>
+                                    </div>
+
+                                    <h6 class="fw-bold mb-2">
+                                        @booking.Client?.FullName
+                                    </h6>
+
+                                    @if (booking.BookingDetails != null &&
+                                                            booking.BookingDetails.Any())
+                                    {
+                                        <div class="mb-2">
+                                            @foreach (var detail in booking.BookingDetails)
+                                            {
+                                                <div class="small text-muted">
+                                                    <i class="bi bi-tools"></i>
+                                                    @detail.Service?.Name
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="small mb-1">
+                                        <i class="bi bi-calendar-event"></i>
+                                        @booking.VisitDate.ToString("MMM dd, yyyy")
+                                    </div>
+
+                                    <div class="small mb-1">
+                                        <i class="bi bi-cash"></i>
+                                        ₱@booking.TotalAmount.ToString("N2")
+                                    </div>
+
+                                    @if (booking.Billing != null)
+                                    {
+                                        <div class="mt-2">
+                                            <span class="badge bg-success">
+                                                Billed
+                                            </span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mt-2">
+                                            <span class="badge bg-warning text-dark">
+                                                Not Billed
+                                            </span>
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-calendar-x fs-3"></i>
+                                <p class="mt-2 mb-0">
+                                    No scheduled bookings
+                                </p>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+</div>
