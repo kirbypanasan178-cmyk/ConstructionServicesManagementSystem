@@ -17,6 +17,7 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IHourlyRateService, HourlyRateService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IToolService, ToolService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 
@@ -35,6 +36,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Tool}/{action=Index}/{id?}");
+    pattern: "{controller=Payment}/{action=Index}/{id?}");
 
 app.Run();

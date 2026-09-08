@@ -1,0 +1,94 @@
+﻿@model List<ConstructionServicesManagementSystem.Models.Billing>
+
+@{
+    ViewData["Title"] = "Process Payment";
+}
+
+<div class="container mt-4">
+
+
+    <h2 class="mb-4">Process Payment</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            There are no pending billing transactions.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Billing Number</th>
+                        <th>Booking</th>
+                        <th>Total Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var billing in Model)
+                    {
+                        <tr>
+                            <td>@billing.BillingNumber</td>
+
+                            <td>
+                                Booking #@billing.BookingId
+                            </td>
+
+                            <td>
+                                ₱@billing.TotalAmount.ToString("N2")
+                            </td>
+
+                            <td>
+                                ₱@billing.AmountPaid.ToString("N2")
+                            </td>
+
+                            <td>
+                                ₱@billing.Balance.ToString("N2")
+                            </td>
+
+                            <td>
+                                @billing.Status
+                            </td>
+
+                            <td>
+                                @billing.CreatedAt
+                            </td>
+
+                            <td>
+                                <a asp-controller="Payment"
+                                   asp-action="Process"
+                                   asp-route-id="@billing.Id"
+                                   class="btn btn-primary btn-sm">
+                                    Process Payment
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
