@@ -1,0 +1,110 @@
+﻿@model List<ConstructionServicesManagementSystem.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Bookings</h2>
+
+        <a asp-action="Create" class="btn btn-primary">
+            Create Booking
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No bookings found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Client</th>
+                        <th>Visit Date</th>
+                        <th>Services</th>
+                        <th>Total Amount</th>
+                        <th>Billing Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>
+                                @booking.Client?.FullName
+                            </td>
+
+                            <td>
+                                @booking.VisitDate.ToString("MMMM dd, yyyy")
+                            </td>
+
+                            <td>
+                                @if (booking.BookingDetails != null &&
+                                                        booking.BookingDetails.Any())
+                                {
+                                    foreach (var detail in booking.BookingDetails)
+                                    {
+                                        <div>
+                                            @detail.Service?.Name
+                                            (@detail.HoursRendered hrs)
+                                        </div>
+                                    }
+                                }
+                            </td>
+
+                            <td>
+                                ₱@booking.TotalAmount.ToString("N2")
+                            </td>
+
+                            <td>
+                                @if (booking.Billing != null)
+                                {
+                                    @booking.Billing.Status
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No Billing
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <a asp-action="Details"
+                                   asp-route-id="@booking.Id"
+                                   class="btn btn-sm btn-info">
+                                    Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+</div>

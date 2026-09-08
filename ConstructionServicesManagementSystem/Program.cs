@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register services here
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IHourlyRateService, HourlyRateService>();
+builder.Services.AddScoped<IBookingService, BookingService>();  
 
 var app = builder.Build();
 
@@ -33,6 +34,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=HourlyRate}/{action=Index}/{id?}");
+    pattern: "{controller=Booking}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,0 +1,182 @@
+﻿@model ConstructionServicesManagementSystem.Models.Booking
+
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>Booking Details</h2>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Back
+        </a>
+
+    </div>
+
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <strong>Booking Information</strong>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Client:</strong>
+                        @Model.Client?.FullName
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Visit Date:</strong>
+                        @Model.VisitDate.ToString("MMMM dd, yyyy")
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <strong>Services</strong>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>Service</th>
+                            <th>Hours</th>
+                            <th>Hourly Rate</th>
+                            <th>Amount</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var detail in Model.BookingDetails)
+                        {
+                            <tr>
+
+                                <td>
+                                    @detail.Service?.Name
+                                </td>
+
+                                <td>
+                                    @detail.HoursRendered
+                                </td>
+
+                                <td>
+                                    ₱@detail.HourlyRate.ToString("N2")
+                                </td>
+
+                                <td>
+                                    ₱@detail.Amount.ToString("N2")
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr>
+                            <th colspan="3"
+                                class="text-end">
+                                Total:
+                            </th>
+
+                            <th>
+                                ₱@Model.TotalAmount.ToString("N2")
+                            </th>
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @if (Model.Billing != null)
+    {
+        <div class="card mb-4">
+
+            <div class="card-header">
+                <strong>Billing Information</strong>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p>
+                            <strong>Billing Number:</strong>
+                            @Model.Billing.BillingNumber
+                        </p>
+
+                        <p>
+                            <strong>Total Amount:</strong>
+                            ₱@Model.Billing.TotalAmount.ToString("N2")
+                        </p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <p>
+                            <strong>Amount Paid:</strong>
+                            ₱@Model.Billing.AmountPaid.ToString("N2")
+                        </p>
+
+                        <p>
+                            <strong>Balance:</strong>
+                            ₱@Model.Billing.Balance.ToString("N2")
+                        </p>
+
+                        <p>
+                            <strong>Status:</strong>
+                            @Model.Billing.Status
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>
