@@ -1,0 +1,265 @@
+﻿@model ConstructionServicesManagementSystem.ViewModels.BillingStatementViewModel
+
+@{
+    ViewData["Title"] = "Billing Statement";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Billing reports</h2>
+
+    <!-- Customer List -->
+    <div class="card mb-4 shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="mb-3">Customers</h5>
+
+            @if (ViewBag.Clients != null && ((IEnumerable<dynamic>)ViewBag.Clients).Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr class="text-secondary">
+                                <th>Customer name</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var client in ViewBag.Clients)
+                            {
+                                bool isSelected = Model != null && Model.ClientId == client.Id;
+
+                                <tr class="@(isSelected ? "table-active" : "")">
+
+                                    <td>
+                                        @client.FullName
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a asp-controller="Reports"
+                                           asp-action="BillingStatement"
+                                           asp-route-clientId="@client.Id"
+                                           class="btn btn-sm @(isSelected ? "btn-primary" : "btn-outline-primary")">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    No customers found.
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    @if (Model != null && Model.ClientId > 0)
+    {
+        <!-- Customer Information -->
+
+        <div class="card mb-4 shadow-sm">
+
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <div>
+                    <h4 class="mb-1">Billing statement</h4>
+                    <p class="mb-0 text-secondary">
+                        Customer: <strong>@Model.ClientName</strong>
+                    </p>
+                </div>
+
+                <span class="badge bg-light text-dark border">
+                    @Model.Items.Count() transaction@(Model.Items.Count() == 1 ? "" : "s")
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Summary -->
+
+        <div class="row mb-4 g-3">
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <h6 class="text-secondary mb-1">Total billing</h6>
+
+                        <h3 class="mb-0">
+                            ₱@Model.TotalBilling.ToString("N2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <h6 class="text-secondary mb-1">Total paid</h6>
+
+                        <h3 class="mb-0 text-success">
+                            ₱@Model.TotalPaid.ToString("N2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <h6 class="text-secondary mb-1">Outstanding balance</h6>
+
+                        <h3 class="mb-0 @(Model.Balance > 0 ? "text-danger" : "text-success")">
+                            ₱@Model.Balance.ToString("N2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Billing Details -->
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h5 class="mb-3">
+                    Billing details
+                </h5>
+
+                @if (Model.Items.Any())
+                {
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle mb-0">
+
+                            <thead>
+
+                                <tr class="text-secondary">
+                                    <th>Date</th>
+                                    <th>Service</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Paid</th>
+                                    <th class="text-end">Balance</th>
+                                    <th>Status</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.Date.ToString("MMM dd, yyyy")
+                                        </td>
+
+                                        <td>
+                                            @item.ServiceName
+                                        </td>
+
+                                        <td class="text-end">
+                                            ₱@item.Amount.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            ₱@item.Paid.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end fw-semibold">
+                                            ₱@item.Balance.ToString("N2")
+                                        </td>
+
+                                        <td>
+                                            @{
+                                                // BUG-CHECK: status is derived, not stored — if you later
+                                                // add a real Status/PaymentStatus field on BillingStatementItem,
+                                                // replace this block with a direct read of that field so
+                                                // partial-payment edge cases (e.g. rounding down to zero
+                                                // balance) don't get misclassified.
+                                                string badgeClass;
+                                                string statusText;
+
+                                                if (item.Balance <= 0)
+                                                {
+                                                    badgeClass = "bg-success-subtle text-success-emphasis";
+                                                    statusText = "Paid";
+                                                }
+                                                else if (item.Paid > 0)
+                                                {
+                                                    badgeClass = "bg-warning-subtle text-warning-emphasis";
+                                                    statusText = "Partial";
+                                                }
+                                                else
+                                                {
+                                                    badgeClass = "bg-danger-subtle text-danger-emphasis";
+                                                    statusText = "Unpaid";
+                                                }
+                                            }
+                                            <span class="badge @badgeClass">@statusText</span>
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">
+                        No billing records found for this customer.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+</div>

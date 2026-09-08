@@ -36,6 +36,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Payment}/{action=Index}/{id?}");
+    pattern: "{controller=Reports}/{action=BillingStatement}/{id?}");
 
 app.Run();
