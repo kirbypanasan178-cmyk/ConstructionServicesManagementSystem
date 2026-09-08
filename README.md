@@ -116,11 +116,49 @@ ConstructionServicesManagementSystem/
 │
 ├── ConstructionServicesManagementSystem/
 │   ├── Controllers/
+│   │   ├── BookingController.cs
+│   │   ├── ClientController.cs
+│   │   ├── PaymentController.cs
+│   │   ├── ReportsController.cs
+│   │   ├── ScheduleController.cs
+│   │   ├── ServiceController.cs
+│   │   └── ToolController.cs
+│   │
 │   ├── Data/
+│   │   └── AppDbContext.cs
+│   │
 │   ├── Enums/
+│   │   ├── BillingStatus.cs
+│   │   └── ...
+│   │
 │   ├── Models/
+│   │   ├── Booking.cs
+│   │   ├── Billing.cs
+│   │   ├── Client.cs
+│   │   ├── Payment.cs
+│   │   ├── Schedule.cs
+│   │   ├── Tool.cs
+│   │   └── ...
+│   │
+│   ├── ViewModels/
+│   │   ├── Booking/
+│   │   ├── Client/
+│   │   ├── Payment/
+│   │   └── ...
+│   │
 │   ├── Services/
 │   │   ├── Interfaces/
+│   │   │   ├── IBookingService.cs
+│   │   │   ├── IClientService.cs
+│   │   │   └── ...
+│   │   ├── BookingService.cs
+│   │   ├── ClientService.cs
+│   │   ├── DashboardService.cs
+│   │   ├── HourlyRateService.cs
+│   │   ├── PaymentService.cs
+│   │   ├── ScheduleService.cs
+│   │   └── ToolService.cs
+│   │
 │   ├── Views/
 │   │   ├── Booking/
 │   │   ├── Client/
@@ -129,18 +167,27 @@ ConstructionServicesManagementSystem/
 │   │   ├── Schedule/
 │   │   ├── Service/
 │   │   └── Tool/
-│   └── ...
+│   │
+│   ├── wwwroot/
+│   ├── Migrations/
+│   ├── Properties/
+│   ├── appsettings.json
+│   ├── Program.cs
+│   └── ConstructionServicesManagementSystem.csproj
 │
 ├── ConstructionServicesManagementSystem.Tests/
-│   ├── BookingServiceTests.cs
-│   ├── ClientServiceTests.cs
-│   ├── DashboardServiceTests.cs
-│   ├── HourlyRateServiceTests.cs
-│   ├── PaymentServiceTests.cs
-│   ├── ScheduleServiceTests.cs
-│   ├── ToolServiceTests.cs
-│   └── ...
+│   ├── Services/
+│   │   ├── BookingServiceTests.cs
+│   │   ├── ClientServiceTests.cs
+│   │   ├── DashboardServiceTests.cs
+│   │   ├── HourlyRateServiceTests.cs
+│   │   ├── PaymentServiceTests.cs
+│   │   ├── ScheduleServiceTests.cs
+│   │   └── ToolServiceTests.cs
+|   | 
+│   └── ConstructionServicesManagementSystem.Tests.csproj
 │
 ├── ConstructionServicesManagementSystem.sln
+├── .gitattributes
 ├── .gitignore
 └── README.md
