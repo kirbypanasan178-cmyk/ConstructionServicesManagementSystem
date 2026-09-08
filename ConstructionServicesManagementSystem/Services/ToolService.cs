@@ -21,7 +21,28 @@ namespace ConstructionServicesManagementSystem.Services
                 .OrderBy(t => t.Name)
                 .ToListAsync();
         }
+        public async Task<List<Tool>> GetAllToolsAsync(int pageNumber, int pageSize, string? search = null, int? serviceId = null)
+        {
+            var query = _context.Tools
+                .Include(t => t.Service)
+                .AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t => t.Name.Contains(search));
+            }
+
+            if (serviceId.HasValue)
+            {
+                query = query.Where(t => t.ServiceId == serviceId.Value);
+            }
+
+            return await query
+                .OrderBy(t => t.Name)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<Tool?> GetToolByIdAsync(int id)
         {
             return await _context.Tools

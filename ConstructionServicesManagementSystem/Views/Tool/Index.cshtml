@@ -1,116 +1,155 @@
-﻿@model IEnumerable<ConstructionServicesManagementSystem.Models.Tool>
+﻿@model List<ConstructionServicesManagementSystem.Models.Tool>
 
 @{
-    ViewData["Title"] = "Tools Inventory";
+    ViewData["Title"] = "Inventory";
 }
 
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2>Tools & Equipment</h2>
-            <p class="text-muted">
-                List of available tools and equipment for each service.
-            </p>
+            <h2 class="fw-bold mb-0">Inventory</h2>
+            <small class="text-muted">Manage tools and equipment</small>
         </div>
-
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Tool
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Tool
         </a>
     </div>
 
-    @if (!Model.Any())
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-info">
-            No tools or equipment have been added yet.
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search"
+                               class="form-control border-start-0"
+                               placeholder="Search by tool name..." />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="serviceId" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Services</option>
+                        @foreach (var service in ViewBag.Services)
+                        {
+                            <option value="@service.Id" selected="@(ViewBag.ServiceId?.ToString() == service.Id.ToString())">
+                                @service.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 text-md-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-x-circle me-1"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-box-seam fs-1 text-muted"></i>
+            <p class="text-muted mt-2 mb-0">No tools found.</p>
         </div>
     }
     else
     {
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-
-                        <thead class="table-light">
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tool Name</th>
+                            <th>Service</th>
+                            <th class="text-end">Quantity</th>
+                            <th>Description</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tool in Model)
+                        {
                             <tr>
-                                <th>Tool / Equipment</th>
-                                <th>Service</th>
-                                <th>Quantity</th>
-                                <th>Description</th>
-                                <th>Availability</th>
-                                <th class="text-center">Actions</th>
+                                <td class="fw-semibold">@tool.Name</td>
+                                <td>@tool.Service?.Name</td>
+                                <td class="text-end">@tool.Quantity</td>
+                                <td class="text-muted small">@tool.Description</td>
+                                <td class="text-center">
+                                    @if (tool.IsAvailable)
+                                    {
+                                        <span class="badge bg-success">Available</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Unavailable</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-id="@tool.Id" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@tool.Id" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
                             </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var tool in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        <strong>@tool.Name</strong>
-                                    </td>
-
-                                    <td>
-                                        @tool.Service?.Name
-                                    </td>
-
-                                    <td>
-                                        @tool.Quantity
-                                    </td>
-
-                                    <td>
-                                        @if (string.IsNullOrWhiteSpace(tool.Description))
-                                        {
-                                            <span class="text-muted">
-                                                No description
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            @tool.Description
-                                        }
-                                    </td>
-
-                                    <td>
-                                        @if (tool.IsAvailable && tool.Quantity > 0)
-                                        {
-                                            <span class="badge bg-success">
-                                                Available
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger">
-                                                Not Available
-                                            </span>
-                                        }
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <a asp-action="Edit"
-                                           asp-route-id="@tool.Id"
-                                           class="btn btn-sm btn-warning">
-                                            Edit
-                                        </a>
-
-                                        <a asp-action="Delete"
-                                           asp-route-id="@tool.Id"
-                                           class="btn btn-sm btn-danger">
-                                            Delete
-                                        </a>
-
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-
-                    </table>
-                </div>
-
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(!ViewBag.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-serviceId="@ViewBag.ServiceId">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Page @ViewBag.CurrentPage</span>
+                </li>
+                <li class="page-item @(!ViewBag.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-serviceId="@ViewBag.ServiceId">Next</a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>
+
+<script>
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchForm = searchInput.closest('form');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => searchForm.submit(), 500);
+    });
+
+    window.addEventListener('DOMContentLoaded', function () {
+        if (searchInput.value) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+        }
+    });
+</script>

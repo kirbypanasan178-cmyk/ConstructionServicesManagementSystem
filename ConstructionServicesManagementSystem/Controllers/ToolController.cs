@@ -9,7 +9,6 @@ namespace ConstructionServicesManagementSystem.Controllers
     {
         private readonly IToolService _toolService;
         private readonly IHourlyRateService _hourlyRateService;
-
         public ToolController(
             IToolService toolService,
             IHourlyRateService hourlyRateService)
@@ -19,18 +18,26 @@ namespace ConstructionServicesManagementSystem.Controllers
         }
 
         // GET: Tool
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string? search = null, int? serviceId = null)
         {
-            var tools = await _toolService.GetAllToolsAsync();
+            int pageSize = 10;
+
+            var tools = await _toolService.GetAllToolsAsync(page, pageSize, search, serviceId);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.Search = search;
+            ViewBag.ServiceId = serviceId;
+            ViewBag.Services = await _hourlyRateService.GetAllAsync();
+            ViewBag.PageSize = pageSize;
+            ViewBag.HasNextPage = tools.Count == pageSize;
+            ViewBag.HasPreviousPage = page > 1;
 
             return View(tools);
         }
-
         // GET: Tool/Create
         public async Task<IActionResult> Create()
         {
             await LoadServices();
-
             return View();
         }
 
@@ -44,9 +51,7 @@ namespace ConstructionServicesManagementSystem.Controllers
                 await LoadServices(tool.ServiceId);
                 return View(tool);
             }
-
             await _toolService.CreateToolAsync(tool);
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -54,14 +59,11 @@ namespace ConstructionServicesManagementSystem.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var tool = await _toolService.GetToolByIdAsync(id);
-
             if (tool == null)
             {
                 return NotFound();
             }
-
             await LoadServices(tool.ServiceId);
-
             return View(tool);
         }
 
@@ -74,20 +76,16 @@ namespace ConstructionServicesManagementSystem.Controllers
             {
                 return NotFound();
             }
-
             if (!ModelState.IsValid)
             {
                 await LoadServices(tool.ServiceId);
                 return View(tool);
             }
-
             var updated = await _toolService.UpdateToolAsync(tool);
-
             if (!updated)
             {
                 return NotFound();
             }
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -95,12 +93,10 @@ namespace ConstructionServicesManagementSystem.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var tool = await _toolService.GetToolByIdAsync(id);
-
             if (tool == null)
             {
                 return NotFound();
             }
-
             return View(tool);
         }
 
@@ -110,12 +106,10 @@ namespace ConstructionServicesManagementSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var deleted = await _toolService.DeleteToolAsync(id);
-
             if (!deleted)
             {
                 return NotFound();
             }
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -123,7 +117,6 @@ namespace ConstructionServicesManagementSystem.Controllers
         private async Task LoadServices(int? selectedServiceId = null)
         {
             var services = await _hourlyRateService.GetAllAsync();
-
             ViewBag.Services = new SelectList(
                 services,
                 "Id",
