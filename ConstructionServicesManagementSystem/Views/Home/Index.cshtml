@@ -1,8 +1,244 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+
+    <!-- Dashboard Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold">Dashboard</h2>
+        <p class="text-muted">
+            Welcome back, Alexis. Here's an overview of your business.
+        </p>
+    </div>
+
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Clients</p>
+                    <h2 class="fw-bold mb-0">25</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Upcoming Bookings</p>
+                    <h2 class="fw-bold mb-0">8</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Pending Payments</p>
+                    <h2 class="fw-bold mb-0">3</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Revenue</p>
+                    <h2 class="fw-bold mb-0">₱125,500.00</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Upcoming Schedule -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Upcoming Schedule</h5>
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Sep 9, 2026</td>
+                            <td>Juan Dela Cruz</td>
+                            <td>Plumbing</td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Sep 10, 2026</td>
+                            <td>Maria Santos</td>
+                            <td>Electrical</td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Sep 12, 2026</td>
+                            <td>Pedro Reyes</td>
+                            <td>Construction</td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Bottom Section -->
+    <div class="row g-4">
+
+        <!-- Recent Payments -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Recent Payments</h5>
+                </div>
+
+                <div class="card-body p-0">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover mb-0">
+
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Reference</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>Juan Dela Cruz</td>
+                                    <td>₱5,000.00</td>
+                                    <td>Sep 8, 2026</td>
+                                    <td>PAY-00001</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Maria Santos</td>
+                                    <td>₱8,500.00</td>
+                                    <td>Sep 7, 2026</td>
+                                    <td>PAY-00002</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Pedro Reyes</td>
+                                    <td>₱3,000.00</td>
+                                    <td>Sep 6, 2026</td>
+                                    <td>PAY-00003</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Quick Actions</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="d-grid gap-2">
+
+                        <a asp-controller="Booking"
+                           asp-action="Create"
+                           class="btn btn-primary">
+                            + New Booking
+                        </a>
+
+                        <a asp-controller="Client"
+                           asp-action="Create"
+                           class="btn btn-outline-primary">
+                            + Add Client
+                        </a>
+
+                        <a asp-controller="Payment"
+                           asp-action="Index"
+                           class="btn btn-outline-primary">
+                            Process Payment
+                        </a>
+
+                        <a asp-controller="Tool"
+                           asp-action="Create"
+                           class="btn btn-outline-primary">
+                            + Add Tool
+                        </a>
+
+                        <a asp-controller="Reports"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            View Reports
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
