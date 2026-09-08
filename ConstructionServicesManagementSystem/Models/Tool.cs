@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace ConstructionServicesManagementSystem.Models
 {
@@ -12,8 +13,10 @@ namespace ConstructionServicesManagementSystem.Models
 
         public int ServiceId { get; set; }
 
+        [ValidateNever]
         public Service Service { get; set; } = null!;
 
+        [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
 
         public string Description { get; set; } = string.Empty;
