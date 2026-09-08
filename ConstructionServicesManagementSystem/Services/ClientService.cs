@@ -27,6 +27,22 @@ namespace ConstructionServicesManagementSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Client>> GetAllClientsAsync(int pageNumber, int pageSize, string? search = null)
+        {
+            var query = _context.Clients.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(c => c.FullName.Contains(search) || c.Email.Contains(search) || c.PhoneNumber.Contains(search));
+            }
+
+            return await query
+                .OrderBy(c => c.FullName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<Client> CreateClientAsync(Client client)
         {
             client.CreatedAt = DateTime.UtcNow;

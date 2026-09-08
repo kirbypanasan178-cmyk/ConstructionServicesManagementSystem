@@ -1,105 +1,97 @@
-﻿@model IEnumerable<ConstructionServicesManagementSystem.Models.Client>
+﻿@model List<ConstructionServicesManagementSystem.Models.Client>
 
 @{
     ViewData["Title"] = "Clients";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>Clients</h2>
-            <p class="text-muted mb-0">Manage your client profiles.</p>
-        </div>
+<h2>Clients</h2>
 
-        <a asp-controller="Client"
-           asp-action="Create"
-           class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Add Client
-        </a>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Client</a>
+</p>
+
+<form method="get" asp-action="Index" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name, email or phone..." />
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
     </div>
+</form>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">
-            No clients have been added yet.
-        </div>
-    }
-    else
-    {
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Address</th>
+            <th>Phone Number</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var client in Model)
+            {
+                <tr>
+                    <td>@client.FullName</td>
+                    <td>@client.Address</td>
+                    <td>@client.PhoneNumber</td>
+                    <td>@client.Email</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-info">Details</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No clients found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Full Name</th>
-                                <th>Phone Number</th>
-                                <th>Email</th>
-                                <th>Address</th>
-                                <th>Created</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
+<nav>
+    <ul class="pagination">
+        <li class="page-item @(!ViewBag.HasPreviousPage ? "disabled" : "")">
+            <a class="page-link" asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage - 1)"
+               asp-route-search="@ViewBag.Search">Previous</a>
+        </li>
 
-                        <tbody>
-                            @foreach (var client in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        <strong>@client.FullName</strong>
-                                    </td>
+        <li class="page-item disabled">
+            <span class="page-link">Page @ViewBag.CurrentPage</span>
+        </li>
 
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(client.PhoneNumber)
-                                                                        ? "N/A"
-                                                                        : client.PhoneNumber)
-                                                                                         </td>
+        <li class="page-item @(!ViewBag.HasNextPage ? "disabled" : "")">
+            <a class="page-link" asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage + 1)"
+               asp-route-search="@ViewBag.Search">Next</a>
+        </li>
+    </ul>
+</nav>
 
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(client.Email)
-                                                                        ? "N/A"
-                                                                        : client.Email)
-                                                                                   </td>
+<script>
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchForm = searchInput.closest('form');
+    let debounceTimer;
 
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(client.Address)
-                                                                        ? "N/A"
-                                                                        : client.Address)
-                            </td>
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            searchForm.submit();
+        }, 500);
+    });
 
-                                    <td>
-                                        @client.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")
-                                    </td>
-
-                                    <td class="text-center">
-                                        <div class="btn-group">
-
-                                            <a asp-controller="Client"
-                                               asp-action="Details"
-                                               asp-route-id="@client.Id"
-                                               class="btn btn-sm btn-outline-primary">
-                                                View
-                                            </a>
-
-                                            <a asp-controller="Client"
-                                               asp-action="Edit"
-                                               asp-route-id="@client.Id"
-                                               class="btn btn-sm btn-outline-secondary">
-                                                Edit
-                                            </a>
-
-                                        </div>
-                                    </td>
-                                </tr>
-                                                }
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-        </div>
-    }
-
-</div>
+    // Restore focus and cursor position after reload
+    window.addEventListener('DOMContentLoaded', function () {
+        if (searchInput.value) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val; // moves cursor to end
+        }
+    });
+</script>

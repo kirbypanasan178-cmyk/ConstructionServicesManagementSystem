@@ -14,9 +14,17 @@ namespace ConstructionServicesManagementSystem.Controllers
         }
 
         // GET: /Client
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string? search = null)
         {
-            var clients = await _clientService.GetAllClientsAsync();
+            int pageSize = 10;
+
+            var clients = await _clientService.GetAllClientsAsync(page, pageSize, search);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.Search = search;
+            ViewBag.PageSize = pageSize;
+            ViewBag.HasNextPage = clients.Count == pageSize;
+            ViewBag.HasPreviousPage = page > 1;
 
             return View(clients);
         }
