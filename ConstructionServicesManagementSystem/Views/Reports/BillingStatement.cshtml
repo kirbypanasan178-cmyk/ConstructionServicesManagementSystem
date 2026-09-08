@@ -6,7 +6,8 @@
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">Billing reports</h2>
+    <h2 class="fw-bold mb-0">Billing Statement</h2>
+    <small class="text-muted">View client billing details and payment status</small>
 
     <!-- Customer List -->
     <div class="card mb-4 shadow-sm">
@@ -233,27 +234,22 @@
 
                                         <td>
                                             @{
-                                                // BUG-CHECK: status is derived, not stored — if you later
-                                                // add a real Status/PaymentStatus field on BillingStatementItem,
-                                                // replace this block with a direct read of that field so
-                                                // partial-payment edge cases (e.g. rounding down to zero
-                                                // balance) don't get misclassified.
                                                 string badgeClass;
                                                 string statusText;
 
                                                 if (item.Balance <= 0)
                                                 {
-                                                    badgeClass = "bg-success-subtle text-success-emphasis";
+                                                    badgeClass = "badge-status badge-status-paid";
                                                     statusText = "Paid";
                                                 }
                                                 else if (item.Paid > 0)
                                                 {
-                                                    badgeClass = "bg-warning-subtle text-warning-emphasis";
+                                                    badgeClass = "badge-status badge-status-partial";
                                                     statusText = "Partial";
                                                 }
                                                 else
                                                 {
-                                                    badgeClass = "bg-danger-subtle text-danger-emphasis";
+                                                    badgeClass = "badge-status badge-status-unpaid";
                                                     statusText = "Unpaid";
                                                 }
                                             }
