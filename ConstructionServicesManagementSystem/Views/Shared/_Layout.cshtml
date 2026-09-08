@@ -40,11 +40,25 @@
                     <span>Clients</span>
                 </a>
 
+                <a asp-controller="Schedule"
+                   asp-action="Weekly"
+                   class="sidebar-link">
+                    <span>🗓️</span>
+                    <span>Weekly Schedule</span>
+                </a>
+
                 <a asp-controller="Booking"
                    asp-action="Index"
                    class="sidebar-link">
                     <span>📅</span>
                     <span>Bookings</span>
+                </a>
+
+                <a asp-controller="HourlyRate"
+                   asp-action="Index"
+                   class="sidebar-link">
+                    <span>🔧</span>
+                    <span>Service</span>
                 </a>
 
                 <a asp-controller="Payment"
