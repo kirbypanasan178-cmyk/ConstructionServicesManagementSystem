@@ -1,0 +1,116 @@
+﻿@model IEnumerable<ConstructionServicesManagementSystem.Models.Service>
+
+@{
+    ViewData["Title"] = "Hourly Rates";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2>Hourly Rates</h2>
+            <p class="text-muted">
+                Manage the hourly rates of services offered.
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-primary">
+            Add Service
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">No services have been added yet.</p>
+
+                    <a asp-action="Create" class="btn btn-primary">
+                        Add First Service
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Service Name</th>
+                                <th>Hourly Rate</th>
+                                <th>Status</th>
+                                <th style="width: 180px;">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                int number = 1;
+                            }
+
+                            @foreach (var service in Model)
+                            {
+                                <tr>
+                                    <td>@number</td>
+
+                                    <td>
+                                        @service.Name
+                                    </td>
+
+                                    <td>
+                                        ₱@service.HourlyRate.ToString("N2")
+                                    </td>
+
+                                    <td>
+                                        @if (service.IsActive)
+                                        {
+                                            <span class="badge bg-success">
+                                                Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                Inactive
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <a asp-action="Edit"
+                                           asp-route-id="@service.Id"
+                                           class="btn btn-sm btn-warning">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@service.Id"
+                                           class="btn btn-sm btn-danger">
+                                            Delete
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                number++;
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
