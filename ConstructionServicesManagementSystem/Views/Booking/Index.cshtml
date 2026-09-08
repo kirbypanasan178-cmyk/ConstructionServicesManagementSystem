@@ -1,4 +1,5 @@
 ﻿@model List<ConstructionServicesManagementSystem.Models.Booking>
+@using ConstructionServicesManagementSystem.Enums
 
 @{
     ViewData["Title"] = "Bookings";
@@ -7,104 +8,169 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Bookings</h2>
-
-        <a asp-action="Create" class="btn btn-primary">
-            Create Booking
+        <div>
+            <h2 class="fw-bold mb-0">Bookings</h2>
+            <small class="text-muted">Manage client bookings and billing status</small>
+        </div>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Create Booking
         </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search"
+                               class="form-control border-start-0"
+                               placeholder="Search by client or billing number..." />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        @foreach (var s in Enum.GetValues(typeof(BillingStatus)))
+                        {
+                            <option value="@s" selected="@(ViewBag.Status?.ToString() == s.ToString())">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 text-md-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-x-circle me-1"></i>Clear
+                    </a>
+                </div>
+            </form>
         </div>
-    }
+    </div>
 
     @if (Model == null || !Model.Any())
     {
-        <div class="alert alert-info">
-            No bookings found.
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x fs-1 text-muted"></i>
+            <p class="text-muted mt-2 mb-0">No bookings found.</p>
         </div>
     }
     else
     {
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-
-                <thead class="table-dark">
-                    <tr>
-                        <th>Client</th>
-                        <th>Visit Date</th>
-                        <th>Services</th>
-                        <th>Total Amount</th>
-                        <th>Billing Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach (var booking in Model)
-                    {
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <td>
-                                @booking.Client?.FullName
-                            </td>
-
-                            <td>
-                                @booking.VisitDate.ToString("MMMM dd, yyyy")
-                            </td>
-
-                            <td>
-                                @if (booking.BookingDetails != null &&
-                                                        booking.BookingDetails.Any())
-                                {
-                                    foreach (var detail in booking.BookingDetails)
-                                    {
-                                        <div>
-                                            @detail.Service?.Name
-                                            (@detail.HoursRendered hrs)
-                                        </div>
-                                    }
-                                }
-                            </td>
-
-                            <td>
-                                ₱@booking.TotalAmount.ToString("N2")
-                            </td>
-
-                            <td>
-                                @if (booking.Billing != null)
-                                {
-                                    @booking.Billing.Status
-                                }
-                                else
-                                {
-                                    <span class="text-muted">
-                                        No Billing
-                                    </span>
-                                }
-                            </td>
-
-                            <td>
-                                <a asp-action="Details"
-                                   asp-route-id="@booking.Id"
-                                   class="btn btn-sm btn-info">
-                                    Details
-                                </a>
-                            </td>
+                            <th>Client</th>
+                            <th>Visit Date</th>
+                            <th>Services</th>
+                            <th class="text-end">Total Amount</th>
+                            <th class="text-center">Billing Status</th>
+                            <th class="text-center">Action</th>
                         </tr>
-                    }
-                </tbody>
-
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@booking.Client?.FullName</td>
+                                <td>@booking.VisitDate.ToString("MMMM dd, yyyy")</td>
+                                <td>
+                                    @if (booking.BookingDetails != null && booking.BookingDetails.Any())
+                                    {
+                                        foreach (var detail in booking.BookingDetails)
+                                        {
+                                            <div class="small">
+                                                <span class="badge bg-light text-dark border">@detail.Service?.Name</span>
+                                                <span class="text-muted">(@detail.HoursRendered hrs)</span>
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                                <td class="text-end fw-semibold">₱@booking.TotalAmount.ToString("N2")</td>
+                                <td class="text-center">
+                                    @if (booking.Billing != null)
+                                    {
+                                        var badgeClass = booking.Billing.Status switch
+                                        {
+                                            BillingStatus.Paid => "bg-success",
+                                            BillingStatus.PartiallyPaid => "bg-warning text-dark",
+                                            BillingStatus.Unpaid => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                        <span class="badge @badgeClass">@booking.Billing.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No Billing</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Details" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye me-1"></i>Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(!ViewBag.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-status="@ViewBag.Status">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Page @ViewBag.CurrentPage</span>
+                </li>
+                <li class="page-item @(!ViewBag.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-status="@ViewBag.Status">Next</a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>
+
+<script>
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchForm = searchInput.closest('form');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => searchForm.submit(), 500);
+    });
+
+    window.addEventListener('DOMContentLoaded', function () {
+        if (searchInput.value) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+        }
+    });
+</script>

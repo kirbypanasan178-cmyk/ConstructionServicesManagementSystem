@@ -26,6 +26,33 @@ namespace ConstructionServicesManagementSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Booking>> GetAllAsync(int pageNumber, int pageSize, string? search = null, BillingStatus? billingStatus = null)
+        {
+            var query = _context.Bookings
+                .Include(b => b.Client)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(d => d.Service)
+                .Include(b => b.Billing)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(b =>
+                    (b.Client != null && b.Client.FullName.Contains(search)) ||
+                    (b.Billing != null && b.Billing.BillingNumber.Contains(search)));
+            }
+
+            if (billingStatus.HasValue)
+            {
+                query = query.Where(b => b.Billing != null && b.Billing.Status == billingStatus.Value);
+            }
+
+            return await query
+                .OrderByDescending(b => b.VisitDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<Booking?> GetByIdAsync(int id)
         {
             return await _context.Bookings

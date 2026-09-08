@@ -1,4 +1,5 @@
-﻿using ConstructionServicesManagementSystem.Models;
+﻿using ConstructionServicesManagementSystem.Enums;
+using ConstructionServicesManagementSystem.Models;
 using ConstructionServicesManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,9 +22,18 @@ namespace ConstructionServicesManagementSystem.Controllers
         }
 
         // GET: Booking
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string? search = null, BillingStatus? status = null)
         {
-            var bookings = await _bookingService.GetAllAsync();
+            int pageSize = 10;
+
+            var bookings = await _bookingService.GetAllAsync(page, pageSize, search, status);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.Search = search;
+            ViewBag.Status = status;
+            ViewBag.PageSize = pageSize;
+            ViewBag.HasNextPage = bookings.Count == pageSize;
+            ViewBag.HasPreviousPage = page > 1;
 
             return View(bookings);
         }
