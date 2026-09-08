@@ -24,4 +24,12 @@
     <ProjectReference Include="..\ConstructionServicesManagementSystem\ConstructionServicesManagementSystem.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\C#_Project\ConstructionServicesManagementSystem\ConstructionServicesManagementSystem.Tests\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\C#_Project\ConstructionServicesManagementSystem\ConstructionServicesManagementSystem.Tests\.editorconfig" />
+  </ItemGroup>
+
 </Project>
