@@ -24,6 +24,28 @@ namespace ConstructionServicesManagementSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Billing>> GetPendingBillingsAsync(int pageNumber, int pageSize, string? search = null)
+        {
+            var query = _context.Billings
+                .Include(b => b.Booking)
+                    .ThenInclude(bk => bk.Client)
+                .Where(b => b.Balance > 0)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(b =>
+                    b.BillingNumber.Contains(search) ||
+                    (b.Booking != null && b.Booking.Client != null && b.Booking.Client.FullName.Contains(search)));
+            }
+
+            return await query
+                .OrderByDescending(b => b.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<Billing?> GetBillingByIdAsync(int billingId)
         {
             return await _context.Billings

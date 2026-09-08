@@ -14,12 +14,31 @@ namespace ConstructionServicesManagementSystem.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> BillingStatement(int? clientId)
+        public async Task<IActionResult> BillingStatement(int? clientId, int page = 1, string? search = null)
         {
-            // Get all clients for dropdown
-            ViewBag.Clients = await _context.Clients
+            int pageSize = 10;
+
+            var clientQuery = _context.Clients.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                clientQuery = clientQuery.Where(c =>
+                    c.FullName.Contains(search) ||
+                    c.Email.Contains(search) ||
+                    c.PhoneNumber.Contains(search));
+            }
+
+            var clients = await clientQuery
                 .OrderBy(c => c.FullName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.Clients = clients;
+            ViewBag.CurrentPage = page;
+            ViewBag.Search = search;
+            ViewBag.HasNextPage = clients.Count == pageSize;
+            ViewBag.HasPreviousPage = page > 1;
 
             // No customer selected
             if (clientId == null)
@@ -55,14 +74,12 @@ namespace ConstructionServicesManagementSystem.Controllers
 
             foreach (var billing in billings)
             {
-                // Calculate total payments for this billing
                 var paid = await _context.Payments
                     .Where(p => p.BillingId == billing.Id)
                     .SumAsync(p => (decimal?)p.Amount) ?? 0;
 
                 var balance = billing.TotalAmount - paid;
 
-                // Get service names from BookingDetails
                 var serviceName = string.Join(
                     ", ",
                     billing.Booking.BookingDetails
@@ -80,7 +97,6 @@ namespace ConstructionServicesManagementSystem.Controllers
                 });
             }
 
-            // Calculate totals
             statement.TotalBilling = statement.Items.Sum(x => x.Amount);
             statement.TotalPaid = statement.Items.Sum(x => x.Paid);
             statement.Balance = statement.Items.Sum(x => x.Balance);

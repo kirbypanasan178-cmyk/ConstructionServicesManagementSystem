@@ -14,9 +14,17 @@ namespace ConstructionServicesManagementSystem.Controllers
         }
 
         // Display all services and hourly rates
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string? search = null)
         {
-            var services = await _hourlyRateService.GetAllAsync();
+            int pageSize = 10;
+
+            var services = await _hourlyRateService.GetAllAsync(page, pageSize, search);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.Search = search;
+            ViewBag.PageSize = pageSize;
+            ViewBag.HasNextPage = services.Count == pageSize;
+            ViewBag.HasPreviousPage = page > 1;
 
             return View(services);
         }

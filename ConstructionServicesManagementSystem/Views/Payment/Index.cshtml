@@ -1,4 +1,5 @@
-﻿@model List<ConstructionServicesManagementSystem.Models.Billing>
+﻿@using ConstructionServicesManagementSystem.Enums
+@model List<ConstructionServicesManagementSystem.Models.Billing>
 
 @{
     ViewData["Title"] = "Process Payment";
@@ -6,89 +7,143 @@
 
 <div class="container mt-4">
 
-
-    <h2 class="mb-4">Process Payment</h2>
+    <div class="mb-4">
+        <h2 class="fw-bold mb-0">Process Payment</h2>
+        <small class="text-muted">Review and settle pending billing transactions</small>
+    </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["Error"]
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search"
+                               class="form-control border-start-0"
+                               placeholder="Search by billing number or client..." />
+                    </div>
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-x-circle me-1"></i>Clear
+                    </a>
+                </div>
+            </form>
         </div>
-    }
+    </div>
 
     @if (Model == null || !Model.Any())
     {
-        <div class="alert alert-info">
-            There are no pending billing transactions.
+        <div class="text-center py-5">
+            <i class="bi bi-check-circle fs-1 text-success"></i>
+            <p class="text-muted mt-2 mb-0">There are no pending billing transactions.</p>
         </div>
     }
     else
     {
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Billing Number</th>
-                        <th>Booking</th>
-                        <th>Total Amount</th>
-                        <th>Amount Paid</th>
-                        <th>Balance</th>
-                        <th>Status</th>
-                        <th>Created Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach (var billing in Model)
-                    {
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <td>@billing.BillingNumber</td>
-
-                            <td>
-                                Booking #@billing.BookingId
-                            </td>
-
-                            <td>
-                                ₱@billing.TotalAmount.ToString("N2")
-                            </td>
-
-                            <td>
-                                ₱@billing.AmountPaid.ToString("N2")
-                            </td>
-
-                            <td>
-                                ₱@billing.Balance.ToString("N2")
-                            </td>
-
-                            <td>
-                                @billing.Status
-                            </td>
-
-                            <td>
-                                @billing.CreatedAt
-                            </td>
-
-                            <td>
-                                <a asp-controller="Payment"
-                                   asp-action="Process"
-                                   asp-route-id="@billing.Id"
-                                   class="btn btn-primary btn-sm">
-                                    Process Payment
-                                </a>
-                            </td>
+                            <th>Billing Number</th>
+                            <th>Booking</th>
+                            <th class="text-end">Total Amount</th>
+                            <th class="text-end">Amount Paid</th>
+                            <th class="text-end">Balance</th>
+                            <th class="text-center">Status</th>
+                            <th>Created Date</th>
+                            <th class="text-center">Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var billing in Model)
+                        {
+                            var badgeClass = billing.Status switch
+                            {
+                                BillingStatus.Paid => "bg-success",
+                                BillingStatus.PartiallyPaid => "bg-warning text-dark",
+                                BillingStatus.Unpaid => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+                            <tr>
+                                <td class="fw-semibold">@billing.BillingNumber</td>
+                                <td>Booking #@billing.BookingId</td>
+                                <td class="text-end">₱@billing.TotalAmount.ToString("N2")</td>
+                                <td class="text-end">₱@billing.AmountPaid.ToString("N2")</td>
+                                <td class="text-end fw-semibold">₱@billing.Balance.ToString("N2")</td>
+                                <td class="text-center">
+                                    <span class="badge @badgeClass">@billing.Status</span>
+                                </td>
+                                <td>@billing.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="text-center">
+                                    <a asp-controller="Payment"
+                                       asp-action="Process"
+                                       asp-route-id="@billing.Id"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="bi bi-cash-coin me-1"></i>Process
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    }
 
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(!ViewBag.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.Search">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Page @ViewBag.CurrentPage</span>
+                </li>
+                <li class="page-item @(!ViewBag.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.Search">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>
+
+<script>
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchForm = searchInput.closest('form');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => searchForm.submit(), 500);
+    });
+
+    window.addEventListener('DOMContentLoaded', function () {
+        if (searchInput.value) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+        }
+    });
+</script>

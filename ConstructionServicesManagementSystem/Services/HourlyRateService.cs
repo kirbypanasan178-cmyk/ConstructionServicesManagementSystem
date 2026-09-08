@@ -22,6 +22,22 @@ namespace ConstructionServicesManagementSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Service>> GetAllAsync(int pageNumber, int pageSize, string? search = null)
+        {
+            var query = _context.Services.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(s => s.Name.Contains(search));
+            }
+
+            return await query
+                .OrderBy(s => s.Name)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         // Get one service
         public async Task<Service?> GetByIdAsync(int id)
         {

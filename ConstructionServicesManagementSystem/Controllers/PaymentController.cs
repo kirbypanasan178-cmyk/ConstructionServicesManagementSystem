@@ -14,9 +14,17 @@ namespace ConstructionServicesManagementSystem.Controllers
         }
 
         // GET: /Payment
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string? search = null)
         {
-            var billings = await _paymentService.GetPendingBillingsAsync();
+            int pageSize = 10;
+
+            var billings = await _paymentService.GetPendingBillingsAsync(page, pageSize, search);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.Search = search;
+            ViewBag.PageSize = pageSize;
+            ViewBag.HasNextPage = billings.Count == pageSize;
+            ViewBag.HasPreviousPage = page > 1;
 
             return View(billings);
         }
